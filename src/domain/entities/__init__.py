@@ -1,0 +1,4 @@
+"""
+Entités métier (Domain Entities)
+"""
+
