@@ -179,6 +179,16 @@ def main():
         show_page_header("👤 Mon Profil", "Gérez vos informations personnelles")
         show_user_profile()
         
+    elif selected_page == "👤 Profil":
+        # Profil pour l'admin
+        auth_service = get_auth_service()
+        if auth_service.is_authenticated() and auth_service.is_admin():
+            show_page_header("👤 Profil Administrateur", "Gérez vos informations personnelles")
+            show_user_profile()
+        else:
+            st.error("🔒 Accès refusé. Cette section est réservée aux administrateurs.")
+            st.info("Connectez-vous avec un compte administrateur pour accéder à cette fonctionnalité.")
+        
     elif selected_page == "📦 Produits":
         show_page_header("📦 Catalogue Produits", "Découvrez notre sélection de produits")
         show_products()

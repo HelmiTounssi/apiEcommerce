@@ -214,10 +214,6 @@ def show_navigation_menu(is_authenticated, auth_service):
         st.session_state.selected_page = "🏠 Accueil"
         st.rerun()
     
-    if st.button("📦 Produits", key="products_btn", use_container_width=True):
-        st.session_state.selected_page = "📦 Produits"
-        st.rerun()
-    
     # Panier pour utilisateurs non connectés
     if not is_authenticated:
         if st.button("🛒 Mon Panier", key="cart_btn", use_container_width=True):
@@ -239,9 +235,15 @@ def show_navigation_menu(is_authenticated, auth_service):
                 st.session_state.selected_page = "🛒 Mon Panier"
                 st.rerun()
         
+        # Produits pour les clients (pas pour l'admin qui l'a dans Administration)
+        if user_role != 'admin':
+            if st.button("📦 Produits", key="products_btn", use_container_width=True):
+                st.session_state.selected_page = "📦 Produits"
+                st.rerun()
+        
         st.markdown('<div class="nav-section-title">Mon Compte</div>', unsafe_allow_html=True)
         
-        # Nom du bouton selon le rôle
+        # Bouton commandes selon le rôle
         if user_role == 'admin':
             if st.button("📋 Commandes", key="orders_btn", use_container_width=True):
                 st.session_state.selected_page = "📋 Commandes"
@@ -251,9 +253,19 @@ def show_navigation_menu(is_authenticated, auth_service):
                 st.session_state.selected_page = "📦 Mes Commandes"
                 st.rerun()
         
+        # Profil pour l'admin
+        if user_role == 'admin':
+            if st.button("👤 Profil", key="profile_btn", use_container_width=True):
+                st.session_state.selected_page = "👤 Profil"
+                st.rerun()
+        
         # Menu admin
         if user_role == 'admin':
             st.markdown('<div class="nav-section-title">Administration</div>', unsafe_allow_html=True)
+            
+            if st.button("📦 Produits", key="products_btn", use_container_width=True):
+                st.session_state.selected_page = "📦 Produits"
+                st.rerun()
             
             if st.button("👥 Utilisateurs", key="users_btn", use_container_width=True):
                 st.session_state.selected_page = "👥 Utilisateurs"
