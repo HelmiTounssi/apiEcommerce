@@ -132,7 +132,28 @@ docker-compose up --build -d
 docker-compose ps
 ```
 
-#### 3. Accéder à l'application
+#### 3. Initialisation de la base de données
+La base de données PostgreSQL est automatiquement initialisée au premier démarrage avec :
+- **Tables créées** : Utilisateurs, Produits, Commandes, Lignes de commande, Panier
+- **Données de test** : Produits, utilisateurs admin et client
+- **Scripts d'initialisation** : Exécutés automatiquement par le backend
+
+**Vérification de l'initialisation :**
+```bash
+# Vérifier les logs d'initialisation
+docker-compose logs backend | grep -i "database\|seed\|init"
+
+# Vérifier que la base contient des données
+docker-compose exec backend python -c "
+from src.data.database.db import db
+from src.domain.models.utilisateur import Utilisateur
+from src.domain.models.produit import Produit
+print(f'Utilisateurs: {Utilisateur.query.count()}')
+print(f'Produits: {Produit.query.count()}')
+"
+```
+
+#### 4. Accéder à l'application
 - **🌐 Interface E-commerce** : https://localhost (HTTPS)
 - **🔧 API Backend** : http://localhost:5000
 - **📚 Documentation Swagger** : http://localhost:5000/docs/
@@ -346,17 +367,44 @@ echo "✅ Maintenance terminée!"
 
 ### Comptes de Test Disponibles (Déjà créés dans la base de données)
 
+> **⚠️ Important :** Ces comptes sont automatiquement créés lors de l'initialisation de la base de données. Si vous ne pouvez pas vous connecter, vérifiez que l'initialisation s'est bien déroulée.
+
 #### 👨‍💼 Administrateur
 - **Email :** `admin@ecommerce.com`
 - **Mot de passe :** `admin123`
 - **Rôle :** Administrateur
 - **Accès :** Gestion complète (produits, commandes, utilisateurs, profil)
+- **Fonctionnalités :** Créer/modifier/supprimer produits, gérer commandes, voir tous les utilisateurs
 
 #### 👤 Client Test
 - **Email :** `client1@example.com`
 - **Mot de passe :** `client123`
 - **Rôle :** Client
 - **Accès :** Catalogue, panier, commandes personnelles, profil
+- **Fonctionnalités :** Parcourir produits, ajouter au panier, passer commandes
+
+#### 🔍 Vérification des comptes dans la base de données
+```bash
+# Vérifier que les comptes existent
+docker-compose exec backend python -c "
+from src.data.database.db import db
+from src.domain.models.utilisateur import Utilisateur
+
+admin = Utilisateur.query.filter_by(email='admin@ecommerce.com').first()
+client = Utilisateur.query.filter_by(email='client1@example.com').first()
+
+print('=== COMPTES DE TEST ===')
+if admin:
+    print(f'✅ Admin: {admin.email} (Rôle: {admin.role})')
+else:
+    print('❌ Compte admin non trouvé')
+
+if client:
+    print(f'✅ Client: {client.email} (Rôle: {client.role})')
+else:
+    print('❌ Compte client non trouvé')
+"
+```
 
 ### 🧪 Instructions de Test pour le Professeur
 
@@ -840,6 +888,37 @@ docker-compose up -d
 docker-compose logs backend | grep -i seed
 ```
 
+#### Comptes de login non trouvés
+- **Cause :** Initialisation de la base de données échouée
+- **Solution :** Recréer la base de données
+```bash
+# Arrêter les services
+docker-compose down
+
+# Supprimer les volumes (ATTENTION: supprime toutes les données)
+docker-compose down -v
+
+# Redémarrer avec initialisation complète
+docker-compose up --build -d
+
+# Vérifier l'initialisation
+docker-compose logs backend | grep -i "database\|seed\|init"
+```
+
+#### Erreur de connexion à la base de données
+- **Cause :** PostgreSQL non démarré ou problème de réseau
+- **Solution :** Vérifier le statut de PostgreSQL
+```bash
+# Vérifier le statut de PostgreSQL
+docker-compose ps postgres
+
+# Voir les logs PostgreSQL
+docker-compose logs postgres
+
+# Redémarrer PostgreSQL
+docker-compose restart postgres
+```
+
 #### Conteneur frontend ne démarre pas
 - **Cause :** Erreur de module Python
 - **Solution :** Vérifiez les imports relatifs dans `frontend/app.py`
@@ -898,13 +977,33 @@ docker-compose logs nginx
 
 ### Checklist de Validation
 
+#### 🐳 Infrastructure Docker
 - [ ] Docker Desktop est démarré
 - [ ] Tous les conteneurs sont "Up" et "Healthy"
+- [ ] PostgreSQL est démarré et accessible
+
+#### 🗄️ Base de données
+- [ ] Base de données initialisée avec succès
+- [ ] Tables créées (utilisateurs, produits, commandes)
+- [ ] Données de test chargées
+- [ ] Comptes admin et client créés
+
+#### 🔐 Authentification
+- [ ] Connexion admin fonctionne (`admin@ecommerce.com` / `admin123`)
+- [ ] Connexion client fonctionne (`client1@example.com` / `client123`)
+- [ ] Interface change selon le rôle utilisateur
+
+#### 🌐 Interface utilisateur
 - [ ] L'interface https://localhost se charge
-- [ ] La connexion admin fonctionne
-- [ ] L'interface client fonctionne
+- [ ] L'interface admin s'affiche correctement
+- [ ] L'interface client s'affiche correctement
+- [ ] Navigation fonctionne dans toutes les sections
+
+#### 🔧 API Backend
 - [ ] L'API backend répond sur http://localhost:5000
 - [ ] La documentation Swagger est accessible
+- [ ] Les endpoints d'authentification fonctionnent
+- [ ] Les endpoints CRUD fonctionnent
 
 Si tous les éléments de la checklist sont validés, l'application e-commerce est prête à être évaluée ! 🎉
 
