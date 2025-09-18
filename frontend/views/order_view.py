@@ -459,3 +459,350 @@ def show_order_confirmation(order_id: int):
         if st.button("🏠 Retour à l'accueil", use_container_width=True):
             st.session_state['selected_page'] = "🏠 Accueil"
             st.rerun()
+
+
+def show_admin_orders():
+    """Affiche la page de gestion des commandes pour les administrateurs"""
+    
+    # Initialiser les services
+    from services.api_client import get_api_client
+    api_client = get_api_client()
+    order_service = OrderService(api_client)
+    
+    # Options d'action pour l'admin
+    st.markdown('<h2 class="section-title">🎯 Actions</h2>', unsafe_allow_html=True)
+    
+    action_options = [
+        "📋 Toutes les commandes",
+        "🔍 Rechercher une commande",
+        "📊 Commandes par statut",
+        "👤 Commandes par utilisateur",
+        "📈 Statistiques des commandes"
+    ]
+    
+    action = st.selectbox(
+        "Choisir une action",
+        action_options,
+        key="admin_order_action",
+        label_visibility="collapsed"
+    )
+    
+    if action == "📋 Toutes les commandes":
+        show_all_orders_admin(order_service)
+    elif action == "🔍 Rechercher une commande":
+        show_order_search_admin(order_service)
+    elif action == "📊 Commandes par statut":
+        show_orders_by_status_admin(order_service)
+    elif action == "👤 Commandes par utilisateur":
+        show_orders_by_user_admin(order_service)
+    elif action == "📈 Statistiques des commandes":
+        show_order_stats_admin(order_service)
+
+
+def show_all_orders_admin(order_service: OrderService):
+    """Affiche toutes les commandes pour l'admin"""
+    st.subheader("📋 Toutes les Commandes")
+    
+    try:
+        orders = order_service.get_all()
+        
+        if not orders:
+            st.info("Aucune commande trouvée")
+            return
+        
+        # Filtres
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            status_filter = st.selectbox(
+                "Filtrer par statut",
+                ["Tous"] + list(set(order.statut for order in orders)),
+                key="admin_status_filter"
+            )
+        
+        with col2:
+            user_filter = st.selectbox(
+                "Filtrer par utilisateur",
+                ["Tous"] + list(set(f"User {order.utilisateur_id}" for order in orders)),
+                key="admin_user_filter"
+            )
+        
+        with col3:
+            search_term = st.text_input("Rechercher par ID", key="admin_order_search")
+        
+        # Appliquer les filtres
+        filtered_orders = orders
+        if status_filter != "Tous":
+            filtered_orders = [o for o in filtered_orders if o.statut == status_filter]
+        
+        if user_filter != "Tous":
+            user_id = int(user_filter.split(" ")[1])
+            filtered_orders = [o for o in filtered_orders if o.utilisateur_id == user_id]
+        
+        if search_term:
+            try:
+                order_id = int(search_term)
+                filtered_orders = [o for o in filtered_orders if o.id == order_id]
+            except ValueError:
+                st.warning("Veuillez entrer un ID de commande valide")
+        
+        # Afficher les commandes
+        for order in filtered_orders:
+            with st.expander(f"Commande #{order.id} - {order.statut} - User {order.utilisateur_id}"):
+                col1, col2 = st.columns([2, 1])
+                
+                with col1:
+                    st.markdown(f"**ID:** {order.id}")
+                    st.markdown(f"**Utilisateur:** {order.utilisateur_id}")
+                    st.markdown(f"**Date:** {order.date_commande}")
+                    st.markdown(f"**Adresse:** {order.adresse_livraison}")
+                    st.markdown(f"**Total:** €{order.total:.2f}")
+                    
+                    # Lignes de commande
+                    if order.lignes_commande:
+                        st.markdown("**Articles:**")
+                        for ligne in order.lignes_commande:
+                            st.markdown(f"• {ligne.quantite}x Produit #{ligne.produit_id} - €{ligne.prix_unitaire:.2f}")
+                
+                with col2:
+                    # Gestion du statut
+                    st.markdown("**Gestion du statut:**")
+                    
+                    current_status = order.statut
+                    new_status = st.selectbox(
+                        "Nouveau statut",
+                        ["en_attente", "validee", "expediee", "annulee"],
+                        index=["en_attente", "validee", "expediee", "annulee"].index(current_status) if current_status in ["en_attente", "validee", "expediee", "annulee"] else 0,
+                        key=f"status_{order.id}"
+                    )
+                    
+                    if st.button("Mettre à jour", key=f"update_status_{order.id}"):
+                        try:
+                            success = order_service.update_status(order.id, new_status)
+                            if success:
+                                st.success(f"Statut mis à jour vers: {new_status}")
+                                st.rerun()
+                            else:
+                                st.error("Erreur lors de la mise à jour")
+                        except Exception as e:
+                            st.error(f"Erreur: {str(e)}")
+                    
+                    # Actions rapides
+                    st.markdown("**Actions:**")
+                    if st.button("Voir détails", key=f"details_{order.id}"):
+                        st.session_state[f"show_order_details_{order.id}"] = True
+                        st.rerun()
+    
+    except Exception as e:
+        st.error(f"Erreur lors du chargement des commandes: {str(e)}")
+
+
+def show_order_search_admin(order_service: OrderService):
+    """Interface de recherche de commande pour l'admin"""
+    st.subheader("🔍 Rechercher une Commande")
+    
+    order_id = st.number_input("ID de la commande", min_value=1, key="search_order_id")
+    
+    if st.button("Rechercher"):
+        try:
+            order = order_service.get_by_id(order_id)
+            if order:
+                show_order_details_admin(order, order_service)
+            else:
+                st.error(f"Commande #{order_id} non trouvée")
+        except Exception as e:
+            st.error(f"Erreur lors de la recherche: {str(e)}")
+
+
+def show_orders_by_status_admin(order_service: OrderService):
+    """Affiche les commandes par statut pour l'admin"""
+    st.subheader("📊 Commandes par Statut")
+    
+    status = st.selectbox(
+        "Statut",
+        ["en_attente", "validee", "expediee", "annulee"],
+        key="status_filter_admin"
+    )
+    
+    if st.button("Afficher"):
+        try:
+            orders = order_service.get_by_status(status)
+            
+            if not orders:
+                st.info(f"Aucune commande avec le statut '{status}'")
+                return
+            
+            st.markdown(f"**{len(orders)} commande(s) avec le statut '{status}':**")
+            
+            for order in orders:
+                with st.expander(f"Commande #{order.id} - User {order.utilisateur_id}"):
+                    col1, col2 = st.columns([2, 1])
+                    
+                    with col1:
+                        st.markdown(f"**ID:** {order.id}")
+                        st.markdown(f"**Utilisateur:** {order.utilisateur_id}")
+                        st.markdown(f"**Date:** {order.date_commande}")
+                        st.markdown(f"**Total:** €{order.total:.2f}")
+                    
+                    with col2:
+                        new_status = st.selectbox(
+                            "Changer statut",
+                            ["en_attente", "validee", "expediee", "annulee"],
+                            index=["en_attente", "validee", "expediee", "annulee"].index(status),
+                            key=f"change_status_{order.id}"
+                        )
+                        
+                        if st.button("Mettre à jour", key=f"update_{order.id}"):
+                            try:
+                                success = order_service.update_status(order.id, new_status)
+                                if success:
+                                    st.success("Statut mis à jour")
+                                    st.rerun()
+                                else:
+                                    st.error("Erreur lors de la mise à jour")
+                            except Exception as e:
+                                st.error(f"Erreur: {str(e)}")
+        
+        except Exception as e:
+            st.error(f"Erreur lors du chargement: {str(e)}")
+
+
+def show_orders_by_user_admin(order_service: OrderService):
+    """Affiche les commandes par utilisateur pour l'admin"""
+    st.subheader("👤 Commandes par Utilisateur")
+    
+    user_id = st.number_input("ID de l'utilisateur", min_value=1, key="user_id_filter")
+    
+    if st.button("Afficher les commandes"):
+        try:
+            orders = order_service.get_by_user(user_id)
+            
+            if not orders:
+                st.info(f"Aucune commande pour l'utilisateur {user_id}")
+                return
+            
+            st.markdown(f"**{len(orders)} commande(s) pour l'utilisateur {user_id}:**")
+            
+            for order in orders:
+                with st.expander(f"Commande #{order.id} - {order.statut}"):
+                    col1, col2 = st.columns([2, 1])
+                    
+                    with col1:
+                        st.markdown(f"**ID:** {order.id}")
+                        st.markdown(f"**Statut:** {order.statut}")
+                        st.markdown(f"**Date:** {order.date_commande}")
+                        st.markdown(f"**Total:** €{order.total:.2f}")
+                    
+                    with col2:
+                        new_status = st.selectbox(
+                            "Changer statut",
+                            ["en_attente", "validee", "expediee", "annulee"],
+                            index=["en_attente", "validee", "expediee", "annulee"].index(order.statut) if order.statut in ["en_attente", "validee", "expediee", "annulee"] else 0,
+                            key=f"user_status_{order.id}"
+                        )
+                        
+                        if st.button("Mettre à jour", key=f"user_update_{order.id}"):
+                            try:
+                                success = order_service.update_status(order.id, new_status)
+                                if success:
+                                    st.success("Statut mis à jour")
+                                    st.rerun()
+                                else:
+                                    st.error("Erreur lors de la mise à jour")
+                            except Exception as e:
+                                st.error(f"Erreur: {str(e)}")
+        
+        except Exception as e:
+            st.error(f"Erreur lors du chargement: {str(e)}")
+
+
+def show_order_stats_admin(order_service: OrderService):
+    """Affiche les statistiques des commandes pour l'admin"""
+    st.subheader("📈 Statistiques des Commandes")
+    
+    try:
+        orders = order_service.get_all()
+        
+        if not orders:
+            st.info("Aucune commande trouvée")
+            return
+        
+        # Statistiques générales
+        col1, col2, col3, col4 = st.columns(4)
+        
+        with col1:
+            st.metric("Total commandes", len(orders))
+        
+        with col2:
+            total_revenue = sum(order.total for order in orders if order.total)
+            st.metric("Chiffre d'affaires", f"€{total_revenue:.2f}")
+        
+        with col3:
+            pending_orders = len([o for o in orders if o.statut == "en_attente"])
+            st.metric("En attente", pending_orders)
+        
+        with col4:
+            completed_orders = len([o for o in orders if o.statut in ["validee", "expediee"]])
+            st.metric("Terminées", completed_orders)
+        
+        # Répartition par statut
+        st.subheader("📊 Répartition par Statut")
+        
+        status_counts = {}
+        for order in orders:
+            status_counts[order.statut] = status_counts.get(order.statut, 0) + 1
+        
+        for status, count in status_counts.items():
+            percentage = (count / len(orders)) * 100
+            st.markdown(f"**{status}:** {count} commandes ({percentage:.1f}%)")
+        
+        # Graphique simple
+        import pandas as pd
+        df = pd.DataFrame(list(status_counts.items()), columns=['Statut', 'Nombre'])
+        
+        if not df.empty:
+            st.bar_chart(df.set_index('Statut'))
+    
+    except Exception as e:
+        st.error(f"Erreur lors du chargement des statistiques: {str(e)}")
+
+
+def show_order_details_admin(order: Order, order_service: OrderService):
+    """Affiche les détails d'une commande pour l'admin"""
+    st.subheader(f"📋 Détails de la Commande #{order.id}")
+    
+    col1, col2 = st.columns([2, 1])
+    
+    with col1:
+        st.markdown(f"**ID:** {order.id}")
+        st.markdown(f"**Utilisateur:** {order.utilisateur_id}")
+        st.markdown(f"**Date:** {order.date_commande}")
+        st.markdown(f"**Statut:** {order.statut}")
+        st.markdown(f"**Adresse:** {order.adresse_livraison}")
+        st.markdown(f"**Total:** €{order.total:.2f}")
+        
+        if order.lignes_commande:
+            st.markdown("**Articles:**")
+            for ligne in order.lignes_commande:
+                st.markdown(f"• {ligne.quantite}x Produit #{ligne.produit_id} - €{ligne.prix_unitaire:.2f}")
+    
+    with col2:
+        st.markdown("**Gestion:**")
+        
+        new_status = st.selectbox(
+            "Nouveau statut",
+            ["en_attente", "validee", "expediee", "annulee"],
+            index=["en_attente", "validee", "expediee", "annulee"].index(order.statut) if order.statut in ["en_attente", "validee", "expediee", "annulee"] else 0,
+            key=f"detail_status_{order.id}"
+        )
+        
+        if st.button("Mettre à jour le statut", key=f"detail_update_{order.id}"):
+            try:
+                success = order_service.update_status(order.id, new_status)
+                if success:
+                    st.success(f"Statut mis à jour vers: {new_status}")
+                    st.rerun()
+                else:
+                    st.error("Erreur lors de la mise à jour")
+            except Exception as e:
+                st.error(f"Erreur: {str(e)}")

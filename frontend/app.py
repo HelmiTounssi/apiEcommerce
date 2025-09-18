@@ -16,7 +16,7 @@ from views import (
     show_professional_sidebar, show_page_header
 )
 from views.cart_view import show_cart_page, show_cart_summary
-from views.order_view import show_order_page, show_checkout_page
+from views.order_view import show_order_page, show_checkout_page, show_admin_orders
 from views.auth_pro_view import show_auth, show_user_profile
 from services.api_client import get_api_client
 from services.auth_service import get_auth_service
@@ -194,9 +194,14 @@ def main():
         show_order_page()
         
     elif selected_page == "📋 Commandes":
-        show_page_header("📋 Gestion des Commandes", "Suivez et gérez vos commandes")
-        # TODO: Implémenter la vue admin des commandes
-        st.info("🚧 Vue admin des commandes en cours de développement")
+        # Vérifier les droits admin
+        auth_service = get_auth_service()
+        if auth_service.is_authenticated() and auth_service.is_admin():
+            show_page_header("📋 Gestion des Commandes", "Administration des commandes clients")
+            show_admin_orders()
+        else:
+            st.error("🔒 Accès refusé. Cette section est réservée aux administrateurs.")
+            st.info("Connectez-vous avec un compte administrateur pour accéder à cette fonctionnalité.")
         
     elif selected_page == "👥 Utilisateurs":
         # Vérifier les droits admin

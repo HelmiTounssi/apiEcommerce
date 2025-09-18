@@ -5,7 +5,8 @@ Configuration centralisée pour le frontend
 import os
 
 # Configuration de l'API
-BACKEND_URL = os.getenv('BACKEND_URL', 'https://localhost')
+# En Docker, utilise le service backend directement, sinon localhost pour le développement local
+BACKEND_URL = os.getenv('BACKEND_URL', 'http://backend:5000' if os.getenv('DOCKER_ENV') else 'https://localhost')
 
 # Configuration Streamlit
 STREAMLIT_PORT = int(os.getenv('STREAMLIT_SERVER_PORT', '8501'))
