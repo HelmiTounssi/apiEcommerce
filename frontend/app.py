@@ -213,7 +213,7 @@ def main():
         auth_service = get_auth_service()
         if auth_service.is_authenticated() and auth_service.is_admin():
             show_page_header("📊 Configuration & Statistiques", "Tableaux de bord, analyses et configuration système")
-            from frontend.views.config_stats_view import ConfigStatsView
+            from views.config_stats_view import ConfigStatsView
             config_stats_view = ConfigStatsView()
             auth_token = auth_service.get_access_token()
             config_stats_view.show_config_stats_page(auth_token)
@@ -226,7 +226,7 @@ def main():
         auth_service = get_auth_service()
         if auth_service.is_authenticated() and auth_service.is_admin():
             show_page_header("📊 Configuration & Statistiques", "Tableaux de bord, analyses et configuration système")
-            from frontend.views.config_stats_view import ConfigStatsView
+            from views.config_stats_view import ConfigStatsView
             config_stats_view = ConfigStatsView()
             auth_token = auth_service.get_access_token()
             config_stats_view.show_config_stats_page(auth_token)
