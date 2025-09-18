@@ -218,10 +218,11 @@ def show_navigation_menu(is_authenticated, auth_service):
         st.session_state.selected_page = "📦 Produits"
         st.rerun()
     
-    # Panier (accessible à tous)
-    if st.button("🛒 Mon Panier", key="cart_btn", use_container_width=True):
-        st.session_state.selected_page = "🛒 Mon Panier"
-        st.rerun()
+    # Panier pour utilisateurs non connectés
+    if not is_authenticated:
+        if st.button("🛒 Mon Panier", key="cart_btn", use_container_width=True):
+            st.session_state.selected_page = "🛒 Mon Panier"
+            st.rerun()
     
     # Menu pour utilisateurs connectés
     if is_authenticated:
@@ -232,11 +233,23 @@ def show_navigation_menu(is_authenticated, auth_service):
         if not user_role:
             user_role = 'client'
         
+        # Panier (pas pour l'admin)
+        if user_role != 'admin':
+            if st.button("🛒 Mon Panier", key="cart_btn", use_container_width=True):
+                st.session_state.selected_page = "🛒 Mon Panier"
+                st.rerun()
+        
         st.markdown('<div class="nav-section-title">Mon Compte</div>', unsafe_allow_html=True)
         
-        if st.button("📦 Mes Commandes", key="orders_btn", use_container_width=True):
-            st.session_state.selected_page = "📦 Mes Commandes"
-            st.rerun()
+        # Nom du bouton selon le rôle
+        if user_role == 'admin':
+            if st.button("📋 Commandes", key="orders_btn", use_container_width=True):
+                st.session_state.selected_page = "📋 Commandes"
+                st.rerun()
+        else:
+            if st.button("📦 Mes Commandes", key="orders_btn", use_container_width=True):
+                st.session_state.selected_page = "📦 Mes Commandes"
+                st.rerun()
         
         # Menu admin
         if user_role == 'admin':
@@ -246,9 +259,6 @@ def show_navigation_menu(is_authenticated, auth_service):
                 st.session_state.selected_page = "👥 Utilisateurs"
                 st.rerun()
             
-            if st.button("📊 Statistiques", key="stats_btn", use_container_width=True):
-                st.session_state.selected_page = "📊 Statistiques"
-                st.rerun()
             
     
     st.markdown('</div>', unsafe_allow_html=True)
