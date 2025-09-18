@@ -46,4 +46,8 @@ class BaseRepository:
             db.session.commit()
             return True
         return False
+    
+    def count(self) -> int:
+        """Compte le nombre total d'enregistrements"""
+        return self.model_class.query.count()
 
