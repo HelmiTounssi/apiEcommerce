@@ -8,19 +8,19 @@ import streamlit as st
 import sys
 import os
 
-# Ajouter le répertoire parent au path pour les imports
-sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+# Ajouter le répertoire courant au path pour les imports
+sys.path.insert(0, os.path.dirname(__file__))
 
-from frontend.views import (
+from views import (
     show_home, show_users, show_products,
     show_professional_sidebar, show_page_header
 )
-from frontend.views.cart_view import show_cart_page, show_cart_summary
-from frontend.views.order_view import show_order_page, show_checkout_page
-from frontend.views.auth_pro_view import show_auth, show_user_profile
-from frontend.services.api_client import get_api_client
-from frontend.services.auth_service import get_auth_service
-from frontend.utils.logging_config import get_logger, log_navigation, log_user_action
+from views.cart_view import show_cart_page, show_cart_summary
+from views.order_view import show_order_page, show_checkout_page
+from views.auth_pro_view import show_auth, show_user_profile
+from services.api_client import get_api_client
+from services.auth_service import get_auth_service
+from utils.logging_config import get_logger, log_navigation, log_user_action
 
 # Configuration du logger
 logger = get_logger(__name__)

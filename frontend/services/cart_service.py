@@ -45,9 +45,10 @@ class CartService:
     
     def __init__(self):
         from services.api_client import get_api_client
+        from config import BACKEND_URL
         self.api_client = get_api_client()
-        self.api_base_url = "http://localhost:5000"
-        self.base_url = f"{self.api_base_url}/panier"
+        self.api_base_url = BACKEND_URL
+        self.base_url = f"{self.api_base_url}/api/panier"
     
     def _get_headers(self, token: Optional[str] = None, include_content_type: bool = True) -> Dict[str, str]:
         """Crée les headers pour les requêtes API"""

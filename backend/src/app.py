@@ -33,6 +33,11 @@ def create_app(config_name='default'):
     from .controller.api import api_bp
     app.register_blueprint(api_bp)
     
+    # Route de health check pour Docker
+    @app.route('/health')
+    def health():
+        return {'status': 'healthy', 'service': 'ecommerce-backend'}, 200
+    
     # Route racine
     @app.route('/')
     def index():

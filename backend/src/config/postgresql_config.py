@@ -21,7 +21,7 @@ class PostgreSQLConfig:
     JWT_EXPIRATION = 3600
     
     # Configuration PostgreSQL
-    DB_HOST = os.environ.get('DB_HOST', 'localhost')
+    DB_HOST = os.environ.get('DB_HOST', 'postgres')
     DB_PORT = os.environ.get('DB_PORT', '5432')
     DB_NAME = os.environ.get('DB_NAME', 'ecommerce_db')
     DB_USER = os.environ.get('DB_USER', 'ecommerce_user')
@@ -39,12 +39,10 @@ class PostgreSQLConfig:
         'echo': False,                      # Désactiver les logs SQL en production
     }
     
-    # Configuration Redis pour le cache
-    REDIS_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
-    
-    # Configuration Celery pour les tâches asynchrones
-    CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'redis://localhost:6379/1')
-    CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', 'redis://localhost:6379/2')
+    # Configuration pour les tâches futures (si nécessaire)
+    # REDIS_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
+    # CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'redis://localhost:6379/1')
+    # CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', 'redis://localhost:6379/2')
 
 
 class DevelopmentPostgreSQLConfig(PostgreSQLConfig):

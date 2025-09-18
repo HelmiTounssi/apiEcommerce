@@ -61,7 +61,7 @@ class TestIHMFrontendIntegration:
             # Simuler une connexion depuis le frontend
             login_data = {
                 "email": "admin@ecommerce.com",
-                "mot_de_passe": "admin123"
+                "mot_de_passe": "password"
             }
             
             response = requests.post('http://localhost:5000/api/auth/login', 
@@ -91,7 +91,7 @@ class TestIHMFrontendIntegration:
             # Authentification
             login_data = {
                 "email": "admin@ecommerce.com",
-                "mot_de_passe": "admin123"
+                "mot_de_passe": "password"
             }
             
             auth_response = requests.post('http://localhost:5000/api/auth/login', 

@@ -1,0 +1,19 @@
+# Backend Requirements
+Flask==2.3.3
+Flask-RESTX==1.1.0
+Flask-SQLAlchemy==3.0.5
+Flask-CORS==4.0.0
+Flask-Migrate==4.0.5
+PyJWT==2.8.0
+Werkzeug==2.3.7
+SQLAlchemy==2.0.21
+psycopg2-binary==2.9.7
+psutil==5.9.6
+python-dotenv==1.0.0
+gunicorn==21.2.0
+pytest==7.4.2
+pytest-cov==4.1.0
+pytest-mock==3.11.1
+pytest-flask==1.2.0
+coverage==7.3.1
+requests==2.31.0

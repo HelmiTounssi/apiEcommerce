@@ -12,8 +12,9 @@ class AuthService:
     """Service pour la gestion de l'authentification côté frontend"""
     
     def __init__(self):
+        from config import BACKEND_URL
         self.api_client = get_api_client()
-        self.base_url = "http://localhost:5000"
+        self.base_url = BACKEND_URL
     
     def register(self, email: str, password: str, nom: str, role: str = "client") -> Dict[str, Any]:
         """

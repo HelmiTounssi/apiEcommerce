@@ -14,7 +14,10 @@ from typing import Dict, List, Any
 class ConfigStatsView:
     """Vue pour la configuration et les statistiques"""
     
-    def __init__(self, api_base_url: str = "http://localhost:5000"):
+    def __init__(self, api_base_url: str = None):
+        if api_base_url is None:
+            from config import BACKEND_URL
+            api_base_url = BACKEND_URL
         self.api_base_url = api_base_url
     
     def show_config_stats_page(self, auth_token: str = None):

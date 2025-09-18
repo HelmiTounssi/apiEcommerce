@@ -9,8 +9,14 @@ from datetime import timedelta
 class Config:
     """Configuration de base"""
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///ecommerce.db'
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'postgresql://ecommerce_user:ecommerce_password_2025@postgres:5432/ecommerce'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        'pool_pre_ping': True,
+        'pool_recycle': 300,
+        'pool_timeout': 20,
+        'max_overflow': 0
+    }
     PERMANENT_SESSION_LIFETIME = timedelta(hours=24)
     
     # Configuration JWT
@@ -23,13 +29,13 @@ class Config:
 class DevelopmentConfig(Config):
     """Configuration pour le développement"""
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'postgresql://ecommerce_user:ecommerce_password@localhost:5432/ecommerce_dev'
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'postgresql://ecommerce_user:ecommerce_password_2025@postgres:5432/ecommerce'
 
 
 class ProductionConfig(Config):
     """Configuration pour la production"""
     DEBUG = False
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///ecommerce_prod.db'
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'postgresql://ecommerce_user:ecommerce_password_2025@postgres:5432/ecommerce'
 
 
 class TestingConfig(Config):

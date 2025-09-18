@@ -5,12 +5,15 @@ Client API pour les appels HTTP
 import requests
 from typing import Dict, Any, Optional, List
 import streamlit as st
+from config import BACKEND_URL
 
 
 class ApiClient:
     """Client API pour les appels HTTP vers le backend"""
     
-    def __init__(self, base_url: str = "http://localhost:5000"):
+    def __init__(self, base_url: str = None):
+        if base_url is None:
+            base_url = BACKEND_URL
         self.base_url = base_url.rstrip('/')
         self.session = requests.Session()
         self.session.headers.update({

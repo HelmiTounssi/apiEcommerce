@@ -263,34 +263,42 @@ def show_test_accounts():
     st.markdown("### 🧪 Comptes de test disponibles")
     st.markdown("Utilisez ces comptes pour tester l'application :")
 
-    col1, col2 = st.columns(2)
+    col1, col2, col3 = st.columns(3)
 
     with col1:
         st.markdown("""
         **👑 Compte Administrateur**
         - Email: `admin@ecommerce.com`
-        - Mot de passe: `admin123`
+        - Mot de passe: `password`
         - Accès: Toutes les fonctionnalités
         """)
 
     with col2:
         st.markdown("""
-        **👤 Compte Client**
+        **👤 Compte Client 1**
         - Email: `client1@example.com`
-        - Mot de passe: `client123`
+        - Mot de passe: `password`
+        - Accès: Catalogue et commandes
+        """)
+
+    with col3:
+        st.markdown("""
+        **👤 Compte Client 2**
+        - Email: `client2@example.com`
+        - Mot de passe: `password`
         - Accès: Catalogue et commandes
         """)
 
     # Boutons de connexion rapide
     st.markdown("**🚀 Connexion rapide :**")
 
-    col1, col2 = st.columns(2)
+    col1, col2, col3 = st.columns(3)
 
     with col1:
         if st.button("🔑 Se connecter en tant qu'admin", use_container_width=True):
             auth_service = get_auth_service()
             try:
-                result = auth_service.login("admin@ecommerce.com", "admin123")
+                result = auth_service.login("admin@ecommerce.com", "password")
                 if result:
                     st.success("✅ Connexion admin réussie!")
                     st.rerun()
@@ -298,12 +306,23 @@ def show_test_accounts():
                 st.error(f"❌ Erreur: {str(e)}")
 
     with col2:
-        if st.button("👤 Se connecter en tant que client", use_container_width=True):
+        if st.button("👤 Se connecter en tant que client 1", use_container_width=True):
             auth_service = get_auth_service()
             try:
-                result = auth_service.login("client1@example.com", "client123")
+                result = auth_service.login("client1@example.com", "password")
                 if result:
-                    st.success("✅ Connexion client réussie!")
+                    st.success("✅ Connexion client 1 réussie!")
+                    st.rerun()
+            except Exception as e:
+                st.error(f"❌ Erreur: {str(e)}")
+
+    with col3:
+        if st.button("👤 Se connecter en tant que client 2", use_container_width=True):
+            auth_service = get_auth_service()
+            try:
+                result = auth_service.login("client2@example.com", "password")
+                if result:
+                    st.success("✅ Connexion client 2 réussie!")
                     st.rerun()
             except Exception as e:
                 st.error(f"❌ Erreur: {str(e)}")
