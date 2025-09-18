@@ -255,7 +255,7 @@ def show_navigation_menu(is_authenticated, auth_service):
         
         # Profil pour l'admin
         if user_role == 'admin':
-            if st.button("👤 Profil", key="profile_btn", use_container_width=True):
+            if st.button("👤 Profil", key="admin_profile_btn", use_container_width=True):
                 st.session_state.selected_page = "👤 Profil"
                 st.rerun()
         
