@@ -108,48 +108,42 @@ streamlit run frontend/app.py --server.port 8501 --server.headless true
 ```
 - Interface : http://localhost:8501
 
-## 🐳 Déploiement avec Docker
+## 🐳 Déploiement avec Docker (Recommandé pour le professeur)
 
-### Docker Compose (Recommandé)
+### Prérequis Docker
+- **Docker Desktop** installé et démarré
+- **Docker Compose** (inclus avec Docker Desktop)
+- **Git** pour cloner le projet
 
-#### 1. Créer le fichier docker-compose.yml
-```yaml
-version: '3.8'
+### Installation Rapide pour le Professeur
 
-services:
-  backend:
-    build: ./backend
-    ports:
-      - "5000:5000"
-    environment:
-      - FLASK_ENV=production
-      - JWT_SECRET_KEY=your-secret-key-here
-    volumes:
-      - ./backend/instance:/app/instance
-      - ./backend/static:/app/static
-    restart: unless-stopped
-
-  frontend:
-    build: ./frontend
-    ports:
-      - "8501:8501"
-    environment:
-      - BACKEND_URL=http://backend:5000
-    depends_on:
-      - backend
-    restart: unless-stopped
-
-  nginx:
-    image: nginx:alpine
-    ports:
-      - "80:80"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
-    depends_on:
-      - backend
-      - frontend
-    restart: unless-stopped
+#### 1. Cloner le projet
+```bash
+git clone <url-du-repo>
+cd apiEcommerce
 ```
+
+#### 2. Démarrer l'application complète
+```bash
+# Démarrer tous les services (PostgreSQL + Backend + Frontend + Nginx)
+docker-compose up --build -d
+
+# Vérifier que tous les services sont démarrés
+docker-compose ps
+```
+
+#### 3. Accéder à l'application
+- **🌐 Interface E-commerce** : https://localhost (HTTPS)
+- **🔧 API Backend** : http://localhost:5000
+- **📚 Documentation Swagger** : http://localhost:5000/docs/
+
+### Configuration Docker Actuelle
+
+Le projet utilise déjà un `docker-compose.yml` complet avec :
+- **PostgreSQL** : Base de données de production
+- **Backend Flask** : API REST avec authentification JWT
+- **Frontend Streamlit** : Interface utilisateur moderne
+- **Nginx** : Reverse proxy avec HTTPS et routage intelligent
 
 #### 2. Créer les Dockerfiles
 
@@ -348,15 +342,49 @@ docker-compose restart
 echo "✅ Maintenance terminée!"
 ```
 
-## 🔐 Authentification
+## 🔐 Authentification et Comptes de Test
 
-### Comptes de Test Disponibles
-- **Admin :** `admin@ecommerce.com` / `admin123`
-- **Client :** `client1@example.com` / `client123`
+### Comptes de Test Disponibles (Déjà créés dans la base de données)
+
+#### 👨‍💼 Administrateur
+- **Email :** `admin@ecommerce.com`
+- **Mot de passe :** `admin123`
+- **Rôle :** Administrateur
+- **Accès :** Gestion complète (produits, commandes, utilisateurs, profil)
+
+#### 👤 Client Test
+- **Email :** `client1@example.com`
+- **Mot de passe :** `client123`
+- **Rôle :** Client
+- **Accès :** Catalogue, panier, commandes personnelles, profil
+
+### 🧪 Instructions de Test pour le Professeur
+
+#### 1. Test de Connexion
+1. Ouvrir https://localhost
+2. Cliquer sur "🔐 Connexion/Inscription"
+3. Se connecter avec un des comptes ci-dessus
+4. Vérifier que l'interface change selon le rôle
+
+#### 2. Test Interface Client
+- **Navigation :** Accueil, Produits, Panier
+- **Mon Compte :** Mes Commandes, Mon Profil
+- **Fonctionnalités :** Ajouter au panier, passer commande
+
+#### 3. Test Interface Admin
+- **Mon Compte :** Profil
+- **Administration :** Produits, Commandes, Utilisateurs
+- **Fonctionnalités :** Créer/modifier produits, gérer commandes, voir utilisateurs
+
+#### 4. Test API Backend
+- Ouvrir http://localhost:5000/docs/
+- Tester les endpoints avec l'authentification JWT
+- Vérifier la documentation Swagger complète
 
 ### Création de Nouveau Compte
 - Utilisez un email **UNIQUE** (pas déjà utilisé)
 - Exemple : `votre_nom@example.com`
+- Le système valide automatiquement l'unicité de l'email
 
 ## 📊 Entités
 
@@ -776,9 +804,48 @@ La base de données SQLite est créée automatiquement au premier démarrage ave
   3. Réinstallez les dépendances : `pip install -r requirements.txt`
 
 ### Problèmes Docker
-- **Erreur de build** : Vérifiez que tous les fichiers sont présents
-- **Erreur de connexion** : Vérifiez les variables d'environnement
-- **Erreur de port** : Vérifiez que les ports ne sont pas déjà utilisés
+
+#### Erreur de build
+- **Cause :** Fichiers manquants ou Dockerfile incorrect
+- **Solution :** Vérifiez que tous les fichiers sont présents et recréez les conteneurs
+```bash
+docker-compose down
+docker-compose up --build -d
+```
+
+#### Erreur de connexion entre conteneurs
+- **Cause :** Problème de réseau Docker
+- **Solution :** Redémarrez Docker Desktop et relancez les conteneurs
+```bash
+docker-compose down
+docker-compose up -d
+```
+
+#### Erreur de port déjà utilisé
+- **Cause :** Ports 80, 443, 5000, 8501 ou 5432 déjà utilisés
+- **Solution :** Arrêtez les autres services utilisant ces ports ou modifiez les ports dans `docker-compose.yml`
+
+#### Erreur de certificat SSL
+- **Cause :** Certificats auto-signés non générés
+- **Solution :** Générez les certificats SSL
+```bash
+# Windows PowerShell (en tant qu'administrateur)
+.\nginx\ssl\generate-certs.ps1
+```
+
+#### Base de données vide
+- **Cause :** Données de test non chargées
+- **Solution :** Vérifiez que le script de seed s'est exécuté
+```bash
+docker-compose logs backend | grep -i seed
+```
+
+#### Conteneur frontend ne démarre pas
+- **Cause :** Erreur de module Python
+- **Solution :** Vérifiez les imports relatifs dans `frontend/app.py`
+```bash
+docker-compose logs frontend
+```
 
 ## 📞 Support
 
@@ -798,14 +865,48 @@ Une fois les serveurs démarrés, accédez à :
 
 ## ✅ Vérification du Démarrage
 
-Pour vérifier que tout fonctionne :
+### Vérification Rapide pour le Professeur
 
-1. **Backend** : Ouvrez http://localhost:5000 dans votre navigateur
-2. **Frontend** : Ouvrez http://localhost:8501 dans votre navigateur
-3. **API** : Testez http://localhost:5000/docs/ pour la documentation Swagger
-4. **Tests** : Exécutez `python backend/test_final_technical_validation.py` pour valider toutes les fonctionnalités
+#### 1. Vérifier que tous les services sont démarrés
+```bash
+docker-compose ps
+```
+Tous les services doivent être "Up" et "Healthy".
 
-Si les pages se chargent correctement et que tous les tests passent, votre application e-commerce est prête à être utilisée ! 🎉
+#### 2. Tester l'accès aux services
+- **🌐 Interface E-commerce** : https://localhost (HTTPS avec certificat auto-signé)
+- **🔧 API Backend** : http://localhost:5000
+- **📚 Documentation Swagger** : http://localhost:5000/docs/
+- **🗄️ Base de données** : PostgreSQL sur le port 5432 (interne)
+
+#### 3. Test de connexion rapide
+1. Ouvrir https://localhost
+2. Se connecter avec `admin@ecommerce.com` / `admin123`
+3. Vérifier que l'interface admin s'affiche
+4. Tester la navigation dans les différentes sections
+
+#### 4. Vérification des logs
+```bash
+# Voir les logs de tous les services
+docker-compose logs
+
+# Voir les logs d'un service spécifique
+docker-compose logs backend
+docker-compose logs frontend
+docker-compose logs nginx
+```
+
+### Checklist de Validation
+
+- [ ] Docker Desktop est démarré
+- [ ] Tous les conteneurs sont "Up" et "Healthy"
+- [ ] L'interface https://localhost se charge
+- [ ] La connexion admin fonctionne
+- [ ] L'interface client fonctionne
+- [ ] L'API backend répond sur http://localhost:5000
+- [ ] La documentation Swagger est accessible
+
+Si tous les éléments de la checklist sont validés, l'application e-commerce est prête à être évaluée ! 🎉
 
 ## 📊 Métriques du projet
 - **Lignes de code** : ~15,000 lignes
