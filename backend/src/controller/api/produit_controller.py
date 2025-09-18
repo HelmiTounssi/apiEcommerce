@@ -82,6 +82,9 @@ class Produit(Resource):
     def put(self, product_id):
         """Met à jour un produit (Admin uniquement)"""
         data = produit_ns.payload
+        # Supprimer l'id du payload pour éviter le conflit avec product_id
+        if 'id' in data:
+            del data['id']
         product = produit_service.update_product(product_id, **data)
         if not product:
             produit_ns.abort(404, f"Produit {product_id} non trouvé")

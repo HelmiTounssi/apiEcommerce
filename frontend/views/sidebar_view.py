@@ -243,12 +243,8 @@ def show_navigation_menu(is_authenticated, auth_service):
         
         st.markdown('<div class="nav-section-title">Mon Compte</div>', unsafe_allow_html=True)
         
-        # Bouton commandes selon le rôle
-        if user_role == 'admin':
-            if st.button("📋 Commandes", key="orders_btn", use_container_width=True):
-                st.session_state.selected_page = "📋 Commandes"
-                st.rerun()
-        else:
+        # Bouton commandes pour les clients uniquement
+        if user_role != 'admin':
             if st.button("📦 Mes Commandes", key="orders_btn", use_container_width=True):
                 st.session_state.selected_page = "📦 Mes Commandes"
                 st.rerun()
@@ -265,6 +261,10 @@ def show_navigation_menu(is_authenticated, auth_service):
             
             if st.button("📦 Produits", key="products_btn", use_container_width=True):
                 st.session_state.selected_page = "📦 Produits"
+                st.rerun()
+            
+            if st.button("📋 Commandes", key="admin_orders_btn", use_container_width=True):
+                st.session_state.selected_page = "📋 Commandes"
                 st.rerun()
             
             if st.button("👥 Utilisateurs", key="users_btn", use_container_width=True):
