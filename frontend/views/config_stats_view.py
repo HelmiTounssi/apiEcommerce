@@ -22,21 +22,18 @@ class ConfigStatsView:
     
     def show_config_stats_page(self, auth_token: str = None):
         """Affiche la page de configuration et statistiques"""
-        st.title("⚙️ Configuration & Statistiques")
+        st.title("📊 Statistiques & Rapports")
         
         # Onglets
-        tab1, tab2, tab3, tab4 = st.tabs(["📊 Statistiques", "⚙️ Configuration", "🔧 Maintenance", "📈 Rapports"])
+        tab1, tab2, tab3 = st.tabs(["📊 Statistiques", "🔧 Maintenance", "📈 Rapports"])
         
         with tab1:
             self.show_statistics_tab(auth_token)
         
         with tab2:
-            self.show_configuration_tab(auth_token)
-        
-        with tab3:
             self.show_maintenance_tab(auth_token)
         
-        with tab4:
+        with tab3:
             self.show_reports_tab(auth_token)
     
     def show_statistics_tab(self, auth_token: str = None):
@@ -105,67 +102,6 @@ class ConfigStatsView:
         else:
             st.error("❌ Impossible de récupérer les statistiques")
     
-    def show_configuration_tab(self, auth_token: str = None):
-        """Affiche l'onglet de configuration"""
-        st.header("⚙️ Configuration du Système")
-        
-        # Configuration de l'application
-        st.subheader("🔧 Paramètres de l'Application")
-        
-        with st.form("config_form"):
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                st.write("**Paramètres Généraux**")
-                app_name = st.text_input("Nom de l'application", value="E-commerce API")
-                debug_mode = st.checkbox("Mode Debug", value=False)
-                maintenance_mode = st.checkbox("Mode Maintenance", value=False)
-                
-                st.write("**Base de Données**")
-                db_type = st.selectbox("Type de base de données", ["SQLite", "PostgreSQL", "MySQL"])
-                db_pool_size = st.number_input("Taille du pool de connexions", min_value=1, max_value=100, value=10)
-            
-            with col2:
-                st.write("**API**")
-                api_timeout = st.number_input("Timeout API (secondes)", min_value=1, max_value=300, value=30)
-                max_requests_per_minute = st.number_input("Max requêtes/minute", min_value=1, max_value=1000, value=100)
-                
-                st.write("**Sécurité**")
-                jwt_expiration = st.number_input("Expiration JWT (heures)", min_value=1, max_value=24, value=1)
-                password_min_length = st.number_input("Longueur min mot de passe", min_value=6, max_value=20, value=8)
-            
-            if st.form_submit_button("💾 Sauvegarder la Configuration"):
-                config_data = {
-                    "app_name": app_name,
-                    "debug_mode": debug_mode,
-                    "maintenance_mode": maintenance_mode,
-                    "database": {
-                        "type": db_type,
-                        "pool_size": db_pool_size
-                    },
-                    "api": {
-                        "timeout": api_timeout,
-                        "max_requests_per_minute": max_requests_per_minute
-                    },
-                    "security": {
-                        "jwt_expiration": jwt_expiration,
-                        "password_min_length": password_min_length
-                    }
-                }
-                
-                if self.save_configuration(config_data, auth_token):
-                    st.success("✅ Configuration sauvegardée avec succès !")
-                else:
-                    st.error("❌ Erreur lors de la sauvegarde de la configuration")
-        
-        # Configuration actuelle
-        st.subheader("📋 Configuration Actuelle")
-        current_config = self.get_current_configuration(auth_token)
-        
-        if current_config:
-            st.json(current_config)
-        else:
-            st.warning("⚠️ Impossible de récupérer la configuration actuelle")
     
     def show_maintenance_tab(self, auth_token: str = None):
         """Affiche l'onglet de maintenance"""

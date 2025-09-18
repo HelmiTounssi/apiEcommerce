@@ -250,9 +250,6 @@ def show_navigation_menu(is_authenticated, auth_service):
                 st.session_state.selected_page = "📊 Statistiques"
                 st.rerun()
             
-            if st.button("⚙️ Configuration", key="config_btn", use_container_width=True):
-                st.session_state.selected_page = "⚙️ Configuration"
-                st.rerun()
     
     st.markdown('</div>', unsafe_allow_html=True)
 

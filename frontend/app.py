@@ -226,18 +226,6 @@ def main():
             st.error("🔒 Accès refusé. Cette section est réservée aux administrateurs.")
             st.info("Connectez-vous avec un compte administrateur pour accéder à cette fonctionnalité.")
             
-    elif selected_page == "⚙️ Configuration":
-        # Vérifier les droits admin
-        auth_service = get_auth_service()
-        if auth_service.is_authenticated() and auth_service.is_admin():
-            show_page_header("📊 Configuration & Statistiques", "Tableaux de bord, analyses et configuration système")
-            from views.config_stats_view import ConfigStatsView
-            config_stats_view = ConfigStatsView()
-            auth_token = auth_service.get_access_token()
-            config_stats_view.show_config_stats_page(auth_token)
-        else:
-            st.error("🔒 Accès refusé. Cette section est réservée aux administrateurs.")
-            st.info("Connectez-vous avec un compte administrateur pour accéder à cette fonctionnalité.")
     
     else:
         st.error(f"Page non trouvée: {selected_page}")
