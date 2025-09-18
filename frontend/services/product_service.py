@@ -3,8 +3,8 @@ Service pour la gestion des produits
 """
 
 from typing import List, Optional
-from .base_service import BaseService
-from ..models import Product, CreateProductRequest, UpdateProductRequest, UpdateStockRequest
+from services.base_service import BaseService
+from models import Product, CreateProductRequest, UpdateProductRequest, UpdateStockRequest
 
 
 class ProductService(BaseService):

@@ -3,9 +3,9 @@ Vue pour la gestion des utilisateurs
 """
 
 import streamlit as st
-from ..services.api_client import get_api_client
-from ..services import UserService
-from ..presenters import UserPresenter
+from services.api_client import get_api_client
+from services import UserService
+from presenters import UserPresenter
 
 
 def show_users():

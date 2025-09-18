@@ -3,10 +3,10 @@ Vue pour la gestion des produits
 """
 
 import streamlit as st
-from ..services.api_client import get_api_client
-from ..services import ProductService
-from ..services.auth_service import get_auth_service
-from ..presenters import ProductPresenter
+from services.api_client import get_api_client
+from services import ProductService
+from services.auth_service import get_auth_service
+from presenters import ProductPresenter
 
 
 def show_products():
@@ -626,8 +626,23 @@ def show_product_detail(product_presenter: ProductPresenter, product_id: int):
                 st.markdown("**🛒 Actions :**")
                 
                 if product.quantite_stock > 0:
-                    if st.button("🛒 Ajouter au panier", key=f"add_to_cart_{product.id}"):
-                        st.info("🚧 Fonctionnalité de panier en cours de développement")
+                    col_qty, col_btn = st.columns([1, 2])
+                    with col_qty:
+                        quantite = st.number_input("Quantité", min_value=1, max_value=product.quantite_stock, value=1, key=f"qty_{product.id}")
+                    with col_btn:
+                        if st.button("🛒 Ajouter au panier", key=f"add_to_cart_{product.id}", use_container_width=True):
+                            from services.cart_service import get_cart_service
+                            
+                            cart_service = get_cart_service()
+                            auth_service = get_auth_service()
+                            token = auth_service.get_access_token() if auth_service.is_authenticated() else None
+                            
+                            result = cart_service.add_to_cart(product.id, quantite, token)
+                            
+                            if result['success']:
+                                st.success(f"✅ {product.nom} ajouté au panier !")
+                            else:
+                                st.error(f"❌ Erreur: {result['message']}")
                 else:
                     st.info("❌ Produit indisponible")
             else:

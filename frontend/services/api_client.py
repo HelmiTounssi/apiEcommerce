@@ -331,6 +331,113 @@ class ApiClient:
         if isinstance(response, dict):
             return response.get('total')
         return None
+    
+    # Méthodes pour le panier
+    def get_cart(self, headers: Optional[Dict] = None) -> Optional[Dict]:
+        """Récupère le panier"""
+        try:
+            url = f"{self.base_url}/api/panier/"
+            # Créer une nouvelle session sans Content-Type pour les requêtes GET
+            session = requests.Session()
+            session.headers.update({'Accept': 'application/json'})
+            
+            if headers:
+                response = session.get(url, headers=headers)
+            else:
+                response = session.get(url)
+            response.raise_for_status()
+            return response.json() if response.content else {}
+        except Exception as e:
+            st.error(f"❌ Erreur récupération panier: {str(e)}")
+            return None
+    
+    def get_cart_summary(self, headers: Optional[Dict] = None) -> Optional[Dict]:
+        """Récupère le résumé du panier"""
+        try:
+            url = f"{self.base_url}/api/panier/resume"
+            # Créer une nouvelle session sans Content-Type pour les requêtes GET
+            session = requests.Session()
+            session.headers.update({'Accept': 'application/json'})
+            
+            if headers:
+                response = session.get(url, headers=headers)
+            else:
+                response = session.get(url)
+            response.raise_for_status()
+            return response.json() if response.content else {}
+        except Exception as e:
+            st.error(f"❌ Erreur résumé panier: {str(e)}")
+            return None
+    
+    def add_to_cart(self, data: Dict, headers: Optional[Dict] = None) -> Optional[Dict]:
+        """Ajoute un produit au panier"""
+        try:
+            url = f"{self.base_url}/api/panier/ajouter"
+            if headers:
+                response = self.session.post(url, json=data, headers=headers)
+            else:
+                response = self.session.post(url, json=data)
+            response.raise_for_status()
+            return response.json() if response.content else {}
+        except Exception as e:
+            st.error(f"❌ Erreur ajout panier: {str(e)}")
+            return None
+    
+    def update_cart_quantity(self, data: Dict, headers: Optional[Dict] = None) -> Optional[Dict]:
+        """Modifie la quantité dans le panier"""
+        try:
+            url = f"{self.base_url}/api/panier/modifier-quantite"
+            if headers:
+                response = self.session.put(url, json=data, headers=headers)
+            else:
+                response = self.session.put(url, json=data)
+            response.raise_for_status()
+            return response.json() if response.content else {}
+        except Exception as e:
+            st.error(f"❌ Erreur modification panier: {str(e)}")
+            return None
+    
+    def remove_from_cart(self, data: Dict, headers: Optional[Dict] = None) -> Optional[Dict]:
+        """Supprime un produit du panier"""
+        try:
+            url = f"{self.base_url}/api/panier/supprimer"
+            if headers:
+                response = self.session.delete(url, json=data, headers=headers)
+            else:
+                response = self.session.delete(url, json=data)
+            response.raise_for_status()
+            return response.json() if response.content else {}
+        except Exception as e:
+            st.error(f"❌ Erreur suppression panier: {str(e)}")
+            return None
+    
+    def clear_cart(self, headers: Optional[Dict] = None) -> Optional[Dict]:
+        """Vide le panier"""
+        try:
+            url = f"{self.base_url}/api/panier/vider"
+            if headers:
+                response = self.session.delete(url, headers=headers)
+            else:
+                response = self.session.delete(url)
+            response.raise_for_status()
+            return response.json() if response.content else {}
+        except Exception as e:
+            st.error(f"❌ Erreur vidage panier: {str(e)}")
+            return None
+    
+    def migrate_cart(self, headers: Optional[Dict] = None) -> Optional[Dict]:
+        """Migre le panier de session vers utilisateur"""
+        try:
+            url = f"{self.base_url}/api/panier/migrer"
+            if headers:
+                response = self.session.post(url, headers=headers)
+            else:
+                response = self.session.post(url)
+            response.raise_for_status()
+            return response.json() if response.content else {}
+        except Exception as e:
+            st.error(f"❌ Erreur migration panier: {str(e)}")
+            return None
 
 
 def get_api_client() -> ApiClient:

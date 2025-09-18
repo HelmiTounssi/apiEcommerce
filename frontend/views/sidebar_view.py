@@ -3,7 +3,7 @@ Vue pour la sidebar professionnelle avec authentification
 """
 
 import streamlit as st
-from ..services.auth_service import get_auth_service
+from services.auth_service import get_auth_service
 
 
 def show_professional_sidebar():
@@ -218,6 +218,11 @@ def show_navigation_menu(is_authenticated, auth_service):
         st.session_state.selected_page = "📦 Produits"
         st.rerun()
     
+    # Panier (accessible à tous)
+    if st.button("🛒 Mon Panier", key="cart_btn", use_container_width=True):
+        st.session_state.selected_page = "🛒 Mon Panier"
+        st.rerun()
+    
     # Menu pour utilisateurs connectés
     if is_authenticated:
         user = auth_service.get_current_user()
@@ -229,8 +234,8 @@ def show_navigation_menu(is_authenticated, auth_service):
         
         st.markdown('<div class="nav-section-title">Mon Compte</div>', unsafe_allow_html=True)
         
-        if st.button("🛒 Mes Commandes", key="orders_btn", use_container_width=True):
-            st.session_state.selected_page = "🛒 Commandes"
+        if st.button("📦 Mes Commandes", key="orders_btn", use_container_width=True):
+            st.session_state.selected_page = "📦 Mes Commandes"
             st.rerun()
         
         # Menu admin

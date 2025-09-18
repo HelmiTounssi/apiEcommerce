@@ -22,8 +22,8 @@ class User:
             raise ValueError("L'email est requis")
         if not self.nom:
             raise ValueError("Le nom est requis")
-        if self.role not in ["client", "admin"]:
-            raise ValueError("Le rôle doit être 'client' ou 'admin'")
+        if self.role not in ["client", "admin", "manager"]:
+            raise ValueError("Le rôle doit être 'client', 'admin' ou 'manager'")
     
     @classmethod
     def from_dict(cls, data: dict) -> 'User':

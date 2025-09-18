@@ -3,8 +3,8 @@ Service pour la gestion des commandes
 """
 
 from typing import List, Optional
-from .base_service import BaseService
-from ..models import Order, CreateOrderRequest, UpdateOrderRequest, UpdateOrderStatusRequest
+from services.base_service import BaseService
+from models import Order, CreateOrderRequest, UpdateOrderRequest, UpdateOrderStatusRequest
 
 
 class OrderService(BaseService):

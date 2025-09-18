@@ -7,8 +7,8 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-from .base_presenter import BasePresenter
-from ..models import Product, CreateProductRequest, UpdateProductRequest
+from presenters.base_presenter import BasePresenter
+from models import Product, CreateProductRequest, UpdateProductRequest
 
 
 class ProductPresenter(BasePresenter):

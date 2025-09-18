@@ -3,8 +3,8 @@ Service pour la gestion des utilisateurs
 """
 
 from typing import List, Optional
-from .base_service import BaseService
-from ..models import User, CreateUserRequest, UpdateUserRequest
+from services.base_service import BaseService
+from models import User, CreateUserRequest, UpdateUserRequest
 
 
 class UserService(BaseService):

@@ -5,7 +5,7 @@ Service d'authentification pour le frontend
 import streamlit as st
 import requests
 from typing import Optional, Dict, Any
-from .api_client import get_api_client
+from services.api_client import get_api_client
 
 
 class AuthService:
@@ -93,14 +93,14 @@ class AuthService:
             if response.status_code == 200:
                 result = response.json()
                 # Stocker le token dans la session
-                st.session_state['access_token'] = result['access_token']
-                st.session_state['user'] = result['user']
+                st.session_state['access_token'] = result['token']
+                st.session_state['user'] = result['utilisateur']
                 st.session_state['is_authenticated'] = True
                 
                 return {
                     'success': True,
                     'message': 'Connexion réussie !',
-                    'user': result['user']
+                    'user': result['utilisateur']
                 }
             else:
                 error_data = response.json()

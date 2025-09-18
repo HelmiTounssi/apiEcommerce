@@ -5,8 +5,8 @@ Présentateur pour la gestion des utilisateurs
 from typing import List, Optional
 import streamlit as st
 import pandas as pd
-from .base_presenter import BasePresenter
-from ..models import User, CreateUserRequest, UpdateUserRequest
+from presenters.base_presenter import BasePresenter
+from models import User, CreateUserRequest, UpdateUserRequest
 
 
 class UserPresenter(BasePresenter):

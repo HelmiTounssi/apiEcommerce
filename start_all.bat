@@ -10,11 +10,11 @@ call .\venv\Scripts\activate
 
 REM Démarrage du backend en arrière-plan
 echo 🚀 Démarrage du backend...
-start "Backend API" cmd /k "python start.py"
+start "Backend API" cmd /k "call .\venv\Scripts\activate && python backend/start.py"
 
 REM Attendre que le backend démarre
 echo ⏳ Attente du démarrage du backend...
-timeout /t 5 /nobreak >nul
+timeout /t 8 /nobreak >nul
 
 REM Vérification que le backend est accessible
 echo 🔍 Vérification du backend...
@@ -41,8 +41,12 @@ echo 🔗 Backend API: http://localhost:5000
 echo ======================================================================
 echo.
 
-streamlit run frontend/app_pro.py --server.port 8501 --server.headless true
+start "Frontend Streamlit" cmd /k "call .\venv\Scripts\activate && streamlit run frontend/app.py --server.port 8501 --server.headless true"
 
 echo.
-echo Application fermée.
+echo ✅ Les deux serveurs ont été démarrés !
+echo 🌐 Frontend: http://localhost:8501
+echo 🔗 Backend: http://localhost:5000
+echo.
+echo Appuyez sur une touche pour fermer cette fenêtre...
 pause

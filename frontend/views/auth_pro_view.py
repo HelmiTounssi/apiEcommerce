@@ -4,7 +4,7 @@ Interface moderne avec onglets et design cohérent
 """
 
 import streamlit as st
-from ..services.auth_service import get_auth_service
+from services.auth_service import get_auth_service
 
 
 def show_auth():

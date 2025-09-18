@@ -3,7 +3,7 @@ Modèle Produit pour le frontend
 """
 
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
 
 
@@ -16,6 +16,8 @@ class Product:
     categorie: str = ""
     prix: float = 0.0
     quantite_stock: int = 0
+    image_url: Optional[str] = None
+    images: Optional[List[str]] = None
     date_creation: Optional[datetime] = None
     
     def __post_init__(self):
@@ -39,6 +41,8 @@ class Product:
             categorie=data.get('categorie', ''),
             prix=float(data.get('prix', 0)),
             quantite_stock=int(data.get('quantite_stock', 0)),
+            image_url=data.get('image_url'),
+            images=data.get('images', []),
             date_creation=datetime.fromisoformat(data['date_creation']) if data.get('date_creation') else None
         )
     
@@ -51,6 +55,8 @@ class Product:
             'categorie': self.categorie,
             'prix': self.prix,
             'quantite_stock': self.quantite_stock,
+            'image_url': self.image_url,
+            'images': self.images or [],
             'date_creation': self.date_creation.isoformat() if self.date_creation else None
         }
     
@@ -61,7 +67,9 @@ class Product:
             'description': self.description,
             'categorie': self.categorie,
             'prix': self.prix,
-            'quantite_stock': self.quantite_stock
+            'quantite_stock': self.quantite_stock,
+            'image_url': self.image_url,
+            'images': self.images
         }
     
     def to_update_dict(self) -> dict:
@@ -77,6 +85,10 @@ class Product:
             data['prix'] = self.prix
         if self.quantite_stock >= 0:
             data['quantite_stock'] = self.quantite_stock
+        if self.image_url is not None:
+            data['image_url'] = self.image_url
+        if self.images is not None:
+            data['images'] = self.images
         return data
 
 
@@ -88,6 +100,8 @@ class CreateProductRequest:
     categorie: str = ""
     prix: float = 0.0
     quantite_stock: int = 0
+    image_url: Optional[str] = None
+    images: Optional[List[str]] = None
     
     def to_dict(self) -> dict:
         """Convertit en dictionnaire"""
@@ -96,7 +110,9 @@ class CreateProductRequest:
             'description': self.description,
             'categorie': self.categorie,
             'prix': self.prix,
-            'quantite_stock': self.quantite_stock
+            'quantite_stock': self.quantite_stock,
+            'image_url': self.image_url,
+            'images': self.images
         }
 
 
@@ -108,6 +124,8 @@ class UpdateProductRequest:
     categorie: Optional[str] = None
     prix: Optional[float] = None
     quantite_stock: Optional[int] = None
+    image_url: Optional[str] = None
+    images: Optional[List[str]] = None
     
     def to_dict(self) -> dict:
         """Convertit en dictionnaire"""
@@ -122,6 +140,10 @@ class UpdateProductRequest:
             data['prix'] = self.prix
         if self.quantite_stock is not None:
             data['quantite_stock'] = self.quantite_stock
+        if self.image_url is not None:
+            data['image_url'] = self.image_url
+        if self.images is not None:
+            data['images'] = self.images
         return data
 
 

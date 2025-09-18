@@ -4,9 +4,9 @@ Présentateur pour la gestion des commandes
 
 import streamlit as st
 from typing import List, Optional, Dict, Any
-from .base_presenter import BasePresenter
-from ..services import OrderService
-from ..models import Order, CreateOrderRequest, UpdateOrderRequest
+from presenters.base_presenter import BasePresenter
+from services import OrderService
+from models import Order, CreateOrderRequest, UpdateOrderRequest
 
 
 class OrderPresenter(BasePresenter):
@@ -180,15 +180,15 @@ class OrderPresenter(BasePresenter):
     
     def get_available_statuses(self) -> List[str]:
         """Retourne la liste des statuts disponibles"""
-        return ["en_attente", "validée", "expédiée", "annulée"]
+        return ["en_attente", "confirme", "expedie", "annulee"]
     
     def get_status_display_name(self, status: str) -> str:
         """Retourne le nom d'affichage d'un statut"""
         status_names = {
             "en_attente": "En attente",
-            "validée": "Validée",
-            "expédiée": "Expédiée",
-            "annulée": "Annulée"
+            "confirme": "Confirmée",
+            "expedie": "Expédiée",
+            "annulee": "Annulée"
         }
         return status_names.get(status, status.title())
     
@@ -196,9 +196,9 @@ class OrderPresenter(BasePresenter):
         """Retourne la couleur d'un statut"""
         status_colors = {
             "en_attente": "🟡",
-            "validée": "🟢",
-            "expédiée": "🔵",
-            "annulée": "🔴"
+            "confirme": "🟢",
+            "expedie": "🔵",
+            "annulee": "🔴"
         }
         return status_colors.get(status, "⚪")
     

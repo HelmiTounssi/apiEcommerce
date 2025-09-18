@@ -71,7 +71,7 @@ class Order:
             raise ValueError("L'ID de l'utilisateur est requis")
         if not self.adresse_livraison:
             raise ValueError("L'adresse de livraison est requise")
-        if self.statut not in ["en_attente", "validée", "expédiée", "annulée"]:
+        if self.statut not in ["en_attente", "confirme", "expedie", "annulee"]:
             raise ValueError("Statut invalide")
         
         if self.lignes_commande is None:
