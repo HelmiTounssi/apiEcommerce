@@ -1,0 +1,19 @@
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: "projects/811027683539/locations/global/workloadIdentityPools/github-pool/providers/github-provider"
+          service_account: "github-deployer@hbe-certif-sec-ebook-26164.iam.gserviceaccount.com"
+
+      - name: Verify identity
+        run: |
+          gcloud auth list
+          curl -s -H "Authorization: Bearer $(gcloud auth print-access-token)" \
+            https://www.googleapis.com/oauth2/v3/userinfo | jq .
